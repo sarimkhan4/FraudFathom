@@ -36,6 +36,8 @@ st.markdown("""
 [data-testid="stHeader"] { background:transparent; }
 .block-container { max-width:1360px; padding-top:1.6rem; padding-bottom:3.5rem; }
 hr { border-color:var(--ff-line) !important; }
+/* hide the automatic "link" icon Streamlit adds beside every heading */
+[data-testid="stHeaderActionElements"] { display:none !important; }
 
 /* ---------- sidebar ---------- */
 [data-testid="stSidebar"] { border-right:1px solid var(--ff-line); background-image:linear-gradient(180deg,rgba(20,184,166,.10),rgba(99,102,241,.07) 60%,transparent); }
