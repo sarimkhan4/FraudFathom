@@ -11,27 +11,98 @@ st.set_page_config(page_title="FraudFathom", page_icon="🛡️", layout="wide",
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
-:root { --ink:#17243a; --muted:#62718a; --panel:#ffffff; --line:#e2e8f0; --accent:#176b59; }
-html, body, [class*="css"] { font-family:'DM Sans',sans-serif; }
-.stApp { background:#f5f8fc; color:var(--ink); }
-h1,h2,h3 { font-family:'Manrope',sans-serif !important; letter-spacing:-.025em; color:#17243a; }
-.block-container { max-width:1440px; padding-top:1.5rem; padding-bottom:3rem; }
-[data-testid="stSidebar"] { background:#ffffff; border-right:1px solid #e2e8f0; }
-[data-testid="stMetric"] { background:#ffffff; border:1px solid #e2e8f0; padding:16px 18px; border-radius:15px; box-shadow:0 2px 8px rgba(24,39,75,.04); }
-[data-testid="stMetricValue"] { color:#176b59; }
-div[data-testid="stVerticalBlockBorderWrapper"] { border-color:#e2e8f0 !important; background:#fff; border-radius:14px; }
-.stButton>button[kind="primary"] { background:#176b59; border:0; color:white; font-weight:700; border-radius:11px; min-height:3rem; }
-.stButton>button { border-radius:10px; border-color:#d5deea; }
-.hero { padding:28px 30px; border:1px solid #dce8e4; border-radius:20px; background:linear-gradient(115deg,#e8f5f0,#ffffff 75%); margin-bottom:22px; }
-.eyebrow { color:#176b59; font-size:.76rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
-.hero h1 { font-size:2.55rem; margin:.35rem 0 .2rem; color:#142b27; }
-.hero p { color:#526779; margin:0; max-width:760px; }
-.panel { background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:18px 20px; box-shadow:0 2px 8px rgba(24,39,75,.035); }
-.muted,.small-note { color:#62718a; }
-.small-note { font-size:.84rem; }
-.pill { display:inline-block; padding:5px 10px; border-radius:30px; background:#e7f4ef; color:#176b59; font-size:.78rem; margin:3px 4px 3px 0; }
-div[data-testid="stAlert"] { border-radius:13px; }
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+/* ============ FraudFathom UI theme ============
+   Colours are neutral translucent layers + two accents, so the same
+   stylesheet reads correctly on Streamlit's light AND dark themes.   */
+:root {
+  --ff-teal:#14b8a6; --ff-indigo:#6366f1; --ff-rose:#f43f5e;
+  --ff-grad:linear-gradient(135deg,#14b8a6 0%,#6366f1 100%);
+  --ff-glass:rgba(127,127,127,.085);
+  --ff-glass-2:rgba(127,127,127,.15);
+  --ff-line:rgba(127,127,127,.28);
+  --ff-glow:0 20px 44px -26px rgba(20,184,166,.75);
+}
+.stApp :is(p,li,label,button,input,textarea,td,th,summary,a,small) { font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif; }
+.stApp :is(h1,h2,h3,h4) { font-family:'Space Grotesk','Plus Jakarta Sans',sans-serif !important; letter-spacing:-.02em; }
+.stApp {
+  background-image:
+    radial-gradient(900px 520px at 6% -8%, rgba(20,184,166,.18), transparent 62%),
+    radial-gradient(820px 520px at 100% -4%, rgba(99,102,241,.17), transparent 62%),
+    radial-gradient(700px 480px at 50% 112%, rgba(244,63,94,.07), transparent 65%);
+  background-attachment:fixed;
+}
+[data-testid="stHeader"] { background:transparent; }
+.block-container { max-width:1360px; padding-top:1.6rem; padding-bottom:3.5rem; }
+hr { border-color:var(--ff-line) !important; }
+
+/* ---------- sidebar ---------- */
+[data-testid="stSidebar"] { border-right:1px solid var(--ff-line); background-image:linear-gradient(180deg,rgba(20,184,166,.10),rgba(99,102,241,.07) 60%,transparent); }
+[data-testid="stSidebar"] h2 { font-size:1.55rem; background:var(--ff-grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"] { letter-spacing:.06em; }
+[data-testid="stSidebar"] [data-testid="stRadioOption"], [data-testid="stSidebar"] label[data-baseweb="radio"] {
+  padding:10px 14px; margin:3px 0; border-radius:12px; border:1px solid transparent; transition:all .18s ease; width:100%; }
+[data-testid="stSidebar"] [data-testid="stRadioOption"]:hover, [data-testid="stSidebar"] label[data-baseweb="radio"]:hover { background:var(--ff-glass-2); }
+[data-testid="stSidebar"] [data-testid="stRadioOption"][data-selected="true"], [data-testid="stSidebar"] [data-testid="stRadioOption"]:has(input:checked) {
+  background:linear-gradient(120deg,rgba(20,184,166,.24),rgba(99,102,241,.20)); border-color:rgba(20,184,166,.55); font-weight:700; }
+[data-testid="stSidebar"] [data-testid="stRadioOption"] > div > div:first-child { display:none; }
+
+/* ---------- hero ---------- */
+.hero { position:relative; overflow:hidden; display:flex; align-items:center; gap:26px; padding:32px 36px; margin-bottom:26px;
+  border:1px solid var(--ff-line); border-radius:26px; box-shadow:var(--ff-glow); backdrop-filter:blur(10px);
+  background:linear-gradient(120deg,rgba(20,184,166,.22),rgba(99,102,241,.17) 58%,rgba(244,63,94,.10)); }
+.hero::after { content:""; position:absolute; right:-70px; top:-80px; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(99,102,241,.38),transparent 66%); pointer-events:none; }
+.hero-mark { flex:0 0 auto; width:74px; height:74px; display:grid; place-items:center; font-size:2.2rem; border-radius:22px; background:var(--ff-grad); box-shadow:0 14px 30px -12px rgba(99,102,241,.8); }
+.hero-body { position:relative; z-index:1; }
+.eyebrow { color:var(--ff-teal); font-size:.74rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+.hero h1 { font-size:3.1rem; line-height:1.05; margin:.3rem 0 .45rem; padding:0; font-weight:700;
+  background:var(--ff-grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.hero p { margin:0; max-width:760px; opacity:.78; line-height:1.55; }
+.chips { margin-top:14px; }
+.chip { display:inline-block; padding:4px 12px; margin:0 6px 4px 0; border-radius:30px; font-size:.74rem; font-weight:600; border:1px solid var(--ff-line); background:var(--ff-glass); }
+
+/* ---------- cards ---------- */
+.stApp [data-testid="stMarkdownContainer"] h3 { padding-top:1.1rem; }
+.panel { background:var(--ff-glass); border:1px solid var(--ff-line); border-radius:18px; padding:20px 22px; backdrop-filter:blur(8px); transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.panel:hover { transform:translateY(-3px); border-color:rgba(20,184,166,.6); box-shadow:var(--ff-glow); }
+.stApp .panel h3 { margin:.25rem 0 .35rem; padding:0; font-size:1.35rem; }
+.muted,.small-note { opacity:.7; }
+.small-note { font-size:.84rem; line-height:1.5; }
+.pill { display:inline-block; padding:5px 12px; margin:3px 5px 3px 0; border-radius:30px; font-size:.78rem; font-weight:600; border:1px solid rgba(20,184,166,.5); background:rgba(20,184,166,.14); }
+
+[data-testid="stMetric"] { position:relative; overflow:hidden; background:var(--ff-glass); border:1px solid var(--ff-line); padding:18px 20px; border-radius:18px; }
+[data-testid="stMetric"]::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--ff-grad); }
+[data-testid="stMetricValue"] { font-family:'Space Grotesk',sans-serif; font-weight:700; background:var(--ff-grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+[data-testid="stVerticalBlockBorderWrapper"], [data-testid="stLayoutWrapper"] > [data-testid="stVerticalBlock"] { border-color:var(--ff-line) !important; background:var(--ff-glass); border-radius:18px; }
+[data-testid="stExpander"] { border:1px solid var(--ff-line) !important; border-radius:16px !important; background:var(--ff-glass); overflow:hidden; }
+div[data-testid="stAlert"] { border-radius:14px; border:1px solid var(--ff-line); }
+[data-testid="stCode"], [data-testid="stTable"] { border-radius:14px; overflow:hidden; border:1px solid var(--ff-line); }
+
+/* ---------- inputs ---------- */
+[data-baseweb="textarea"], [data-baseweb="select"] > div, [data-baseweb="base-input"] { border-radius:14px !important; border:1px solid var(--ff-line) !important; background-color:var(--ff-glass) !important; transition:border-color .18s, box-shadow .18s; }
+[data-baseweb="textarea"]:focus-within, [data-baseweb="select"] > div:focus-within { border-color:var(--ff-teal) !important; box-shadow:0 0 0 3px rgba(20,184,166,.25); }
+[data-testid="stCheckbox"] label:has(input:checked) > div:nth-of-type(1) { background-color:var(--ff-teal) !important; border-color:var(--ff-teal) !important; }
+
+/* ---------- buttons ---------- */
+.stButton>button, [data-testid="stDownloadButton"]>button { border-radius:12px; border:1px solid var(--ff-line); background:var(--ff-glass); transition:all .18s ease; }
+.stButton>button:hover, [data-testid="stDownloadButton"]>button:hover { border-color:var(--ff-teal); transform:translateY(-1px); box-shadow:0 10px 22px -14px rgba(20,184,166,.9); }
+.stButton>button[kind="primary"], [data-testid="stBaseButton-primary"] { background:var(--ff-grad); border:0; color:#fff; font-weight:700; letter-spacing:.01em; min-height:3.1rem; border-radius:14px; box-shadow:var(--ff-glow); }
+.stButton>button[kind="primary"] p, [data-testid="stBaseButton-primary"] p { color:#fff; }
+.stButton>button[kind="primary"]:hover, [data-testid="stBaseButton-primary"]:hover { filter:brightness(1.08); transform:translateY(-2px); }
+
+/* ---------- assessment result ---------- */
+.result { position:relative; overflow:hidden; border:1px solid var(--ff-line); border-radius:22px; padding:24px 28px; margin-bottom:8px;
+  background:linear-gradient(120deg,color-mix(in srgb,var(--rc) 20%,transparent),var(--ff-glass) 70%); box-shadow:0 22px 46px -30px var(--rc); }
+.result::before { content:""; position:absolute; left:0; top:0; bottom:0; width:6px; background:var(--rc); }
+.result-top { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+.result-level { font-family:'Space Grotesk',sans-serif; font-size:2.3rem; font-weight:700; text-transform:uppercase; color:var(--rc); line-height:1.1; margin:.2rem 0; }
+.result-score { text-align:right; }
+.result-score .num { font-family:'Space Grotesk',sans-serif; font-size:2.8rem; font-weight:700; line-height:1; }
+.track { height:11px; border-radius:11px; margin-top:18px; overflow:hidden; background:var(--ff-glass-2); }
+.fill { height:100%; border-radius:11px; background:linear-gradient(90deg,color-mix(in srgb,var(--rc) 55%,transparent),var(--rc)); box-shadow:0 0 14px var(--rc); }
+
+@media (max-width:768px) { .hero { flex-direction:column; align-items:flex-start; padding:24px; } .hero h1 { font-size:2.3rem; } .result-score { text-align:left; } }
 </style>
 """, unsafe_allow_html=True)
 
@@ -62,13 +133,17 @@ with st.sidebar:
 def header():
     st.markdown("""
     <div class="hero">
-      <div class="eyebrow">Pakistan-focused · Explainable AI</div>
-      <h1>FraudFathom</h1>
-      <p>Understand suspicious digital messages before you act. Explore warning signs, inspect the reasoning, and get practical next steps.</p>
+      <div class="hero-mark">🛡️</div>
+      <div class="hero-body">
+        <div class="eyebrow">Pakistan-focused · Explainable AI</div>
+        <h1>FraudFathom</h1>
+        <p>Understand suspicious digital messages before you act. Explore warning signs, inspect the reasoning, and get practical next steps.</p>
+        <div class="chips"><span class="chip">Rule-based</span><span class="chip">SWI-Prolog inference</span><span class="chip">Transparent rules</span></div>
+      </div>
     </div>""", unsafe_allow_html=True)
 
 def risk_color(level):
-    return {"critical":"#ff5d70","high":"#ff9d5c","medium":"#f5cf65","low":"#54d6a0"}.get(level,"#9eacc7")
+    return {"critical":"#e11d48","high":"#ea580c","medium":"#d19a06","low":"#059669"}.get(level,"#7c8aa5")
 
 def run_analysis(flags, channel, message=""):
     # An empty evidence set is still a valid baseline assessment. It should
@@ -96,17 +171,17 @@ def show_result(r):
     color = risk_color(level)
     score_pct = min(100, round(r["score"] / 30 * 100))
     st.markdown(f"""
-    <div class="panel" style="border-left:5px solid {color};">
-      <div class="eyebrow">Assessment result</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-        <div><div style="font-size:2rem;font-weight:700;color:{color};text-transform:uppercase">{level} RISK</div>
-        <div class="muted">Rule-based risk assessment · {r['created_at']}</div></div>
-        <div style="text-align:right"><div style="font-size:2.2rem;font-weight:700">{r['score']}</div><div class="muted">weighted points</div></div>
+    <div class="result" style="--rc:{color}">
+      <div class="result-top">
+        <div>
+          <div class="eyebrow">Assessment result</div>
+          <div class="result-level">{level} RISK</div>
+          <div class="muted">Rule-based risk assessment · {r['created_at']}</div>
+        </div>
+        <div class="result-score"><div class="num">{r['score']}</div><div class="muted">weighted points</div></div>
       </div>
-      <div style="height:9px;background:#263650;border-radius:9px;margin-top:16px;overflow:hidden">
-        <div style="height:100%;width:{score_pct}%;background:{color};border-radius:9px"></div>
-      </div>
-      <div class="small-note" style="margin-top:8px">Visual scale is capped at 30 points; risk categories are determined by Prolog thresholds.</div>
+      <div class="track"><div class="fill" style="width:{score_pct}%"></div></div>
+      <div class="small-note" style="margin-top:10px">Visual scale is capped at 30 points; risk categories are determined by Prolog thresholds.</div>
     </div>""", unsafe_allow_html=True)
     left, right = st.columns([1.1, .9], gap="large")
     with left:
@@ -157,7 +232,7 @@ if page == "Dashboard":
     stages = st.columns(4)
     for col, n, title, desc in zip(stages, ["01","02","03","04"], ["Observe","Infer","Classify","Advise"], ["User reports warning signs or submits a message.","Prolog derives higher-level fraud signals.","Rules identify matching scam patterns and risk.","The system explains its findings and suggests actions."]):
         with col:
-            st.markdown(f'<div class="panel"><div class="eyebrow">STEP {n}</div><h3>{title}</h3><div class="small-note">{desc}</div></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="panel step"><div class="eyebrow">STEP {n}</div><h3>{title}</h3><div class="small-note">{desc}</div></div>', unsafe_allow_html=True)
     st.markdown("### Recent assessments")
     if not st.session_state.history:
         st.info("No assessments yet. Open **Analyze a message** or choose a demo scenario from the sidebar.")
