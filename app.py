@@ -12,10 +12,6 @@ st.set_page_config(page_title="FraudFathom", page_icon="🛡️", layout="wide",
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
-
-/* ============ FraudFathom UI theme ============
-   Colours are neutral translucent layers + two accents, so the same
-   stylesheet reads correctly on Streamlit's light AND dark themes.   */
 :root {
   --ff-teal:#14b8a6; --ff-indigo:#6366f1; --ff-rose:#f43f5e;
   --ff-grad:linear-gradient(135deg,#14b8a6 0%,#6366f1 100%);
@@ -36,7 +32,6 @@ st.markdown("""
 [data-testid="stHeader"] { background:transparent; }
 .block-container { max-width:1360px; padding-top:1.6rem; padding-bottom:3.5rem; }
 hr { border-color:var(--ff-line) !important; }
-/* hide the automatic "link" icon Streamlit adds beside every heading */
 [data-testid="stHeaderActionElements"] { display:none !important; }
 
 /* ---------- sidebar ---------- */
@@ -148,8 +143,6 @@ def risk_color(level):
     return {"critical":"#e11d48","high":"#ea580c","medium":"#d19a06","low":"#059669"}.get(level,"#7c8aa5")
 
 def run_analysis(flags, channel, message=""):
-    # An empty evidence set is still a valid baseline assessment. It should
-    # produce a low-risk result with an explicit caution, not block the user.
     try:
         raw = run_prolog(flags, channel)
         result = parse_output(raw)
@@ -274,9 +267,6 @@ elif page == "Analyze a message":
                     checked = st.checkbox(label, key=f"flag_{flag}")
                     if checked: selected_flags.append(flag)
     if st.button("🔍 Analyze with expert system", type="primary", use_container_width=True):
-        # Always include automatically extracted indicators. Streamlit checkbox
-        # widget keys can retain an earlier value across reruns, so relying only
-        # on selected_flags can accidentally discard fresh message detections.
         evidence_flags = sorted(set(selected_flags) | set(extracted["flags"]))
         run_analysis(evidence_flags, channel, message)
     if st.session_state.analysis_result:

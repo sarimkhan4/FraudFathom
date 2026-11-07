@@ -1,4 +1,3 @@
-"""Safe, validated bridge between Python and SWI-Prolog."""
 from pathlib import Path
 import shutil
 import subprocess
@@ -43,7 +42,6 @@ def parse_output(output):
         elif parts[0] == "ACTION" and len(parts) >= 2: result["actions"].append(parts[1])
     if result["level"] not in {"low","medium","high","critical"}:
         raise ValueError("Prolog returned an invalid risk level.")
-    # Attach the exact source clauses for every matched rule ID.
     try:
         for line in KB_PATH.read_text(encoding="utf-8").splitlines():
             for _, rule_id, _ in result["scams"]:

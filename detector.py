@@ -1,4 +1,3 @@
-"""Transparent keyword/phrase extraction. This is not machine learning."""
 import re
 
 GROUPS = {

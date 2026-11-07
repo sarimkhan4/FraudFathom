@@ -1,14 +1,10 @@
-% ============================================================
 %  FraudFathom - Digital Fraud Detection Expert System
-%  Educational rule-based prototype. Scores are heuristic points, not probabilities.
-%  Knowledge base (SWI-Prolog)
-%
-%  Architecture (forward-style reasoning in 3 layers):
-%    Layer 0: FACTS      - red flags the user observed (asserted by Python)
+
+%  Architecture:
+%    Layer 0: FACTS      - red flags the user observed
 %    Layer 1: SIGNALS    - general fraud signals derived from facts
 %    Layer 2: SCAM TYPES - scam(Type, RuleID) derived from signals
 %    Layer 3: DECISION   - risk score, risk level, recommended actions
-% ============================================================
 
 % ---------- Layer 0: facts the user can report (dynamic) ----------
 :- dynamic asks_otp/0, asks_pin/0, asks_card_details/0, asks_cnic/0.
@@ -59,11 +55,9 @@ describe(marketplace_scam, "Fake buyer/seller on marketplaces (e.g. OLX) trying 
 describe(otp_theft, "Direct attempt to steal your One-Time Password.").
 describe(credit_card_activation_fraud, "Scammer asks for a fee to activate a bank card and may steal your OTP or card details.").
 
-% ============================================================
 %  Layer 1: SIGNAL RULES (26 rules)
-% ============================================================
 
-% sensitive_info_request: they want secret/personal data
+% sensitive_info_request: they ask for OTP, PIN, card details or CNIC
 sensitive_info_request :- asks_otp.
 sensitive_info_request :- asks_pin.
 sensitive_info_request :- asks_card_details.
@@ -107,57 +101,76 @@ reward_bait :- too_good_salary.
 sloppy_message :- spelling_errors.
 
 % credit_card_activation_attempt: payment requested to activate a bank card
-credit_card_activation_attempt :-
-    card_activation_request,
-    asks_advance_fee.
+credit_card_activation_attempt :- card_activation_request, asks_advance_fee.
 
-% ============================================================
 %  Layer 2: SCAM-TYPE RULES (63 rules) - scam(Type, RuleID)
-% ============================================================
 
 scam(bank_impersonation, s01) :- claims_bank, sensitive_info_request.
 scam(bank_impersonation, s02) :- claims_bank, pressure_tactic, unsafe_link.
-
 scam(phishing_link, s03) :- unsafe_link, sensitive_info_request.
 scam(phishing_link, s04) :- fake_domain, authority_impersonation.
-
 scam(lottery_prize, s05) :- prize_lottery, money_demand.
 scam(lottery_prize, s06) :- prize_lottery, sensitive_info_request.
-
 scam(govt_aid_scam, s07) :- claims_government, prize_lottery.
 scam(govt_aid_scam, s08) :- claims_government, asks_cnic, channel(sms).
-
 scam(fake_officer_threat, s09) :- claims_government, urgent_threat, money_demand.
-
 scam(job_scam, s10) :- too_good_salary, asks_advance_fee.
 scam(job_scam, s11) :- too_good_salary, channel(whatsapp), unknown_sender.
-
 scam(investment_scam, s12) :- guaranteed_returns, unknown_sender.
 scam(investment_scam, s13) :- guaranteed_returns, channel(social_media).
-
 scam(wallet_fraud, s14) :- wrong_transfer_claim, asks_wallet_transfer.
 scam(wallet_fraud, s15) :- claims_telecom, asks_pin.
-
 scam(remote_access_scam, s16) :- device_takeover, authority_impersonation.
-
 scam(malicious_app, s17) :- asks_install_app, unsafe_link.
-
 scam(courier_scam, s18) :- claims_courier, asks_advance_fee.
 scam(courier_scam, s19) :- claims_courier, unsafe_link.
-
 scam(family_emergency, s20) :- emotional_request, money_demand, unknown_sender.
-
 scam(romance_scam, s21) :- romance_contact, money_demand.
-
 scam(marketplace_scam, s22) :- marketplace_deal, asks_otp.
 scam(marketplace_scam, s23) :- marketplace_deal, unsafe_link.
-
 scam(otp_theft, s24) :- asks_otp, pressure_tactic.
 scam(otp_theft, s25) :- asks_otp, unofficial_contact.
+scam(bank_impersonation, s26) :- claims_bank, asks_pin.
+scam(bank_impersonation, s27) :- claims_bank, asks_card_details.
+scam(bank_impersonation, s28) :- claims_bank, personal_number_used, sensitive_info_request.
+scam(phishing_link, s29) :- suspicious_link, asks_otp.
+scam(phishing_link, s30) :- shortened_link, authority_impersonation.
+scam(phishing_link, s31) :- fake_domain, asks_pin.
+scam(lottery_prize, s32) :- prize_lottery, asks_advance_fee.
+scam(lottery_prize, s33) :- prize_lottery, asks_cnic, unknown_sender.
+scam(govt_aid_scam, s34) :- claims_government, asks_advance_fee.
+scam(govt_aid_scam, s35) :- claims_government, suspicious_link, asks_cnic.
+scam(fake_officer_threat, s36) :- claims_government, urgent_threat, asks_advance_fee.
+scam(fake_officer_threat, s37) :- claims_government, asks_secrecy, money_demand.
+scam(job_scam, s38) :- too_good_salary, asks_wallet_transfer.
+scam(job_scam, s39) :- too_good_salary, personal_number_used, asks_advance_fee.
+scam(job_scam, s40) :- too_good_salary, suspicious_link, unknown_sender.
+scam(investment_scam, s41) :- guaranteed_returns, asks_wallet_transfer.
+scam(investment_scam, s42) :- guaranteed_returns, asks_advance_fee.
+scam(investment_scam, s43) :- guaranteed_returns, asks_secrecy.
+scam(wallet_fraud, s44) :- claims_telecom, asks_otp.
+scam(wallet_fraud, s45) :- wrong_transfer_claim, asks_otp.
+scam(wallet_fraud, s46) :- asks_wallet_transfer, urgent_threat, unknown_sender.
+scam(remote_access_scam, s47) :- asks_remote_access, claims_bank.
+scam(remote_access_scam, s48) :- asks_install_app, asks_remote_access.
+scam(malicious_app, s49) :- asks_install_app, unknown_sender.
+scam(malicious_app, s50) :- asks_install_app, personal_number_used.
+scam(courier_scam, s51) :- claims_courier, suspicious_link, asks_cnic.
+scam(courier_scam, s52) :- claims_courier, urgent_threat, asks_advance_fee.
+scam(family_emergency, s53) :- emotional_request, asks_wallet_transfer.
+scam(family_emergency, s54) :- emotional_request, urgent_threat, asks_secrecy.
+scam(romance_scam, s55) :- romance_contact, asks_wallet_transfer.
+scam(romance_scam, s56) :- romance_contact, asks_advance_fee.
+scam(marketplace_scam, s57) :- marketplace_deal, asks_pin.
+scam(marketplace_scam, s58) :- marketplace_deal, asks_card_details.
+scam(otp_theft, s59) :- asks_otp, personal_number_used.
+scam(otp_theft, s60) :- asks_otp, asks_secrecy, unknown_sender.
+scam(credit_card_activation_fraud, s61) :- card_activation_request, asks_advance_fee, asks_otp.
+scam(credit_card_activation_fraud, s62) :- card_activation_request, asks_card_details, asks_advance_fee.
+scam(otp_theft, s63) :- asks_otp, asks_card_details, asks_advance_fee.
 
-% ============================================================
+
 %  Layer 3: DECISION RULES
-% ============================================================
 
 % total risk score = sum of weights of every reported red flag
 risk_score(S) :-
@@ -201,52 +214,8 @@ action("Report to FIA Cyber Crime Wing (helpline 1991) and inform your bank imme
 action("No strong red flags found, but stay alert and never share your OTP.") :-
     risk_level(L), L == low.
 
-
-% ---------- Additional classification rules (s26-s60) ----------
-% Expanded coverage: combinations remain explainable and use only observed facts/signals.
-scam(bank_impersonation, s26) :- claims_bank, asks_pin.
-scam(bank_impersonation, s27) :- claims_bank, asks_card_details.
-scam(bank_impersonation, s28) :- claims_bank, personal_number_used, sensitive_info_request.
-scam(phishing_link, s29) :- suspicious_link, asks_otp.
-scam(phishing_link, s30) :- shortened_link, authority_impersonation.
-scam(phishing_link, s31) :- fake_domain, asks_pin.
-scam(lottery_prize, s32) :- prize_lottery, asks_advance_fee.
-scam(lottery_prize, s33) :- prize_lottery, asks_cnic, unknown_sender.
-scam(govt_aid_scam, s34) :- claims_government, asks_advance_fee.
-scam(govt_aid_scam, s35) :- claims_government, suspicious_link, asks_cnic.
-scam(fake_officer_threat, s36) :- claims_government, urgent_threat, asks_advance_fee.
-scam(fake_officer_threat, s37) :- claims_government, asks_secrecy, money_demand.
-scam(job_scam, s38) :- too_good_salary, asks_wallet_transfer.
-scam(job_scam, s39) :- too_good_salary, personal_number_used, asks_advance_fee.
-scam(job_scam, s40) :- too_good_salary, suspicious_link, unknown_sender.
-scam(investment_scam, s41) :- guaranteed_returns, asks_wallet_transfer.
-scam(investment_scam, s42) :- guaranteed_returns, asks_advance_fee.
-scam(investment_scam, s43) :- guaranteed_returns, asks_secrecy.
-scam(wallet_fraud, s44) :- claims_telecom, asks_otp.
-scam(wallet_fraud, s45) :- wrong_transfer_claim, asks_otp.
-scam(wallet_fraud, s46) :- asks_wallet_transfer, urgent_threat, unknown_sender.
-scam(remote_access_scam, s47) :- asks_remote_access, claims_bank.
-scam(remote_access_scam, s48) :- asks_install_app, asks_remote_access.
-scam(malicious_app, s49) :- asks_install_app, unknown_sender.
-scam(malicious_app, s50) :- asks_install_app, personal_number_used.
-scam(courier_scam, s51) :- claims_courier, suspicious_link, asks_cnic.
-scam(courier_scam, s52) :- claims_courier, urgent_threat, asks_advance_fee.
-scam(family_emergency, s53) :- emotional_request, asks_wallet_transfer.
-scam(family_emergency, s54) :- emotional_request, urgent_threat, asks_secrecy.
-scam(romance_scam, s55) :- romance_contact, asks_wallet_transfer.
-scam(romance_scam, s56) :- romance_contact, asks_advance_fee.
-scam(marketplace_scam, s57) :- marketplace_deal, asks_pin.
-scam(marketplace_scam, s58) :- marketplace_deal, asks_card_details.
-scam(otp_theft, s59) :- asks_otp, personal_number_used.
-scam(otp_theft, s60) :- asks_otp, asks_secrecy, unknown_sender.
-% Credit/debit card activation fraud
-scam(credit_card_activation_fraud, s61) :- card_activation_request, asks_advance_fee, asks_otp.
-scam(credit_card_activation_fraud, s62) :- card_activation_request, asks_card_details, asks_advance_fee.
-scam(otp_theft, s63) :- asks_otp, asks_card_details, asks_advance_fee.
-
-% ============================================================
 %  Entry point: prints machine-readable lines for Python
-% ============================================================
+
 run :-
     risk_score(S), risk_level(L),
     format("SCORE|~w~n", [S]),
